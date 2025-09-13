@@ -140,8 +140,6 @@ myCnf: |
   innodb_autoinc_lock_mode=2
   innodb_buffer_pool_size=128M
   max_allowed_packet=256M
-  
-  # Galera cluster settings
   wsrep_on=ON
   wsrep_cluster_name="mariadb-galera-cluster"
   wsrep_cluster_address="gcomm://"
@@ -155,8 +153,6 @@ myCnf: |
   wsrep_convert_LOCK_to_trx=0
   wsrep_retry_autocommit=1
   wsrep_auto_increment_control=1
-  
-  # InnoDB settings for Galera
   innodb_flush_log_at_trx_commit=2
   innodb_locks_unsafe_for_binlog=1
 

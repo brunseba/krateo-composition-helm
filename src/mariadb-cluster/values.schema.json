@@ -12,7 +12,7 @@
     },
     "fullnameOverride": {
       "type": "string",
-      "title": "Full Name Override", 
+      "title": "Full Name Override",
       "description": "Override the full name of the chart",
       "default": ""
     },
@@ -25,32 +25,15 @@
           "type": "string",
           "title": "Cluster Name",
           "description": "Name of the MariaDB cluster",
-          "default": "mariadb",
-          "pattern": "^[a-z0-9]([a-z0-9-]*[a-z0-9])?$"
+          "default": "mariadb"
         },
         "replicas": {
           "type": "integer",
           "title": "Number of Replicas",
-          "description": "Number of MariaDB cluster nodes (minimum 3 recommended for Galera)",
+          "description": "Number of MariaDB cluster nodes",
           "default": 3,
           "minimum": 1,
           "maximum": 9
-        },
-        "labels": {
-          "type": "object",
-          "title": "Additional Labels",
-          "description": "Additional labels to apply to cluster resources",
-          "additionalProperties": {
-            "type": "string"
-          }
-        },
-        "annotations": {
-          "type": "object", 
-          "title": "Additional Annotations",
-          "description": "Additional annotations to apply to cluster resources",
-          "additionalProperties": {
-            "type": "string"
-          }
         }
       },
       "required": ["name", "replicas"]
@@ -92,15 +75,13 @@
       "type": "string",
       "title": "Database Name",
       "description": "Name of the default database to create",
-      "default": "mariadb",
-      "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$"
+      "default": "mariadb"
     },
     "username": {
-      "type": "string", 
-      "title": "Database Username",
+      "type": "string",
+      "title": "Database Username", 
       "description": "Username for the default database user",
-      "default": "mariadb",
-      "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$"
+      "default": "mariadb"
     },
     "rootPassword": {
       "type": "object",
@@ -112,55 +93,19 @@
           "title": "Auto-generate Password",
           "description": "Automatically generate a secure root password",
           "default": true
-        },
-        "existingSecret": {
-          "type": "object",
-          "title": "Existing Secret",
-          "description": "Use password from existing Kubernetes secret",
-          "properties": {
-            "name": {
-              "type": "string",
-              "title": "Secret Name",
-              "description": "Name of existing secret containing root password"
-            },
-            "key": {
-              "type": "string", 
-              "title": "Secret Key",
-              "description": "Key within secret containing root password",
-              "default": "password"
-            }
-          }
         }
       }
     },
     "userPassword": {
-      "type": "object", 
-      "title": "User Password Configuration",
+      "type": "object",
+      "title": "User Password Configuration", 
       "description": "Configure database user password",
       "properties": {
         "generate": {
           "type": "boolean",
           "title": "Auto-generate Password",
-          "description": "Automatically generate a secure user password", 
+          "description": "Automatically generate a secure user password",
           "default": true
-        },
-        "existingSecret": {
-          "type": "object",
-          "title": "Existing Secret",
-          "description": "Use password from existing Kubernetes secret",
-          "properties": {
-            "name": {
-              "type": "string",
-              "title": "Secret Name",
-              "description": "Name of existing secret containing user password"
-            },
-            "key": {
-              "type": "string",
-              "title": "Secret Key", 
-              "description": "Key within secret containing user password",
-              "default": "password"
-            }
-          }
         }
       }
     },
@@ -177,7 +122,7 @@
         },
         "sst": {
           "type": "string",
-          "title": "State Snapshot Transfer Method", 
+          "title": "State Snapshot Transfer Method",
           "description": "Method used for state snapshot transfer between nodes",
           "default": "mariabackup",
           "enum": ["mariabackup", "rsync", "mysqldump"]
@@ -194,15 +139,14 @@
     },
     "storage": {
       "type": "object",
-      "title": "Storage Configuration", 
+      "title": "Storage Configuration",
       "description": "Persistent storage settings for MariaDB data",
       "properties": {
         "size": {
           "type": "string",
           "title": "Storage Size",
           "description": "Size of persistent volume for MariaDB data",
-          "default": "10Gi",
-          "pattern": "^[0-9]+(Ei|Pi|Ti|Gi|Mi|Ki|E|P|T|G|M|K)?$"
+          "default": "10Gi"
         },
         "storageClassName": {
           "type": "string",
@@ -214,11 +158,11 @@
           "type": "array",
           "title": "Access Modes",
           "description": "Storage access modes",
-          "default": ["ReadWriteOnce"],
           "items": {
             "type": "string",
             "enum": ["ReadWriteOnce", "ReadOnlyMany", "ReadWriteMany", "ReadWriteOncePod"]
-          }
+          },
+          "default": ["ReadWriteOnce"]
         }
       },
       "required": ["size"]
@@ -234,18 +178,16 @@
           "description": "Minimum resources guaranteed for each pod",
           "properties": {
             "cpu": {
-              "type": "string", 
+              "type": "string",
               "title": "CPU Request",
               "description": "Minimum CPU required (e.g., 100m, 0.5)",
-              "default": "100m",
-              "pattern": "^[0-9]+(m|[0-9]*\\.?[0-9]*)?$"
+              "default": "100m"
             },
             "memory": {
               "type": "string",
-              "title": "Memory Request", 
+              "title": "Memory Request",
               "description": "Minimum memory required (e.g., 128Mi, 1Gi)",
-              "default": "128Mi",
-              "pattern": "^[0-9]+(Ei|Pi|Ti|Gi|Mi|Ki|E|P|T|G|M|K)?$"
+              "default": "128Mi"
             }
           }
         },
@@ -256,17 +198,15 @@
           "properties": {
             "cpu": {
               "type": "string",
-              "title": "CPU Limit", 
+              "title": "CPU Limit",
               "description": "Maximum CPU allowed (e.g., 300m, 1)",
-              "default": "300m",
-              "pattern": "^[0-9]+(m|[0-9]*\\.?[0-9]*)?$"
+              "default": "300m"
             },
             "memory": {
               "type": "string",
               "title": "Memory Limit",
               "description": "Maximum memory allowed (e.g., 512Mi, 2Gi)",
-              "default": "512Mi",
-              "pattern": "^[0-9]+(Ei|Pi|Ti|Gi|Mi|Ki|E|P|T|G|M|K)?$"
+              "default": "512Mi"
             }
           }
         }
@@ -286,7 +226,7 @@
         },
         "primary": {
           "type": "object",
-          "title": "Primary Service", 
+          "title": "Primary Service",
           "description": "Service for read-write access to primary node",
           "properties": {
             "type": {
@@ -304,9 +244,9 @@
           "description": "Service for read-only access to replica nodes",
           "properties": {
             "type": {
-              "type": "string", 
+              "type": "string",
               "title": "Secondary Service Type",
-              "description": "Service type for secondary (read-only) access",
+              "description": "Service type for secondary (read-only) access", 
               "default": "ClusterIP",
               "enum": ["ClusterIP", "NodePort", "LoadBalancer"]
             }
@@ -341,14 +281,14 @@
       }
     },
     "secondaryConnection": {
-      "type": "object", 
+      "type": "object",
       "title": "Secondary Connection",
       "description": "Connection configuration for secondary (read-only) access",
       "properties": {
         "enabled": {
           "type": "boolean",
           "title": "Enable Secondary Connection Secret",
-          "description": "Create connection secret for secondary database access", 
+          "description": "Create connection secret for secondary database access",
           "default": true
         }
       }
@@ -357,8 +297,7 @@
       "type": "string",
       "title": "MariaDB Configuration (my.cnf)",
       "description": "Custom MariaDB configuration in my.cnf format",
-      "format": "textarea",
-      "default": "[mariadb]\nbind-address=*\ndefault_storage_engine=InnoDB\nbinlog_format=row\ninnodb_autoinc_lock_mode=2\ninnodb_buffer_pool_size=128M\nmax_allowed_packet=256M"
+      "format": "textarea"
     },
     "updateStrategy": {
       "type": "object",
@@ -376,7 +315,7 @@
     },
     "metrics": {
       "type": "object",
-      "title": "Metrics and Monitoring", 
+      "title": "Metrics and Monitoring",
       "description": "Enable Prometheus metrics collection",
       "properties": {
         "enabled": {
@@ -395,44 +334,9 @@
               "title": "Enable Service Monitor",
               "description": "Create Prometheus ServiceMonitor for automatic scraping",
               "default": false
-            },
-            "interval": {
-              "type": "string",
-              "title": "Scrape Interval",
-              "description": "How often to scrape metrics (e.g., 30s, 1m)",
-              "default": "30s",
-              "pattern": "^[0-9]+(ns|us|µs|ms|s|m|h)$"
-            },
-            "scrapeTimeout": {
-              "type": "string",
-              "title": "Scrape Timeout", 
-              "description": "Timeout for metrics scraping (e.g., 10s)",
-              "default": "10s",
-              "pattern": "^[0-9]+(ns|us|µs|ms|s|m|h)$"
             }
           }
         }
-      }
-    },
-    "affinity": {
-      "type": "object",
-      "title": "Pod Affinity/Anti-Affinity",
-      "description": "Control pod scheduling preferences"
-    },
-    "nodeSelector": {
-      "type": "object",
-      "title": "Node Selector",
-      "description": "Select nodes for pod scheduling",
-      "additionalProperties": {
-        "type": "string"
-      }
-    },
-    "tolerations": {
-      "type": "array",
-      "title": "Tolerations", 
-      "description": "Allow pods to be scheduled on nodes with matching taints",
-      "items": {
-        "type": "object"
       }
     }
   },
