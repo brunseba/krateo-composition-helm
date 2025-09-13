@@ -153,16 +153,6 @@
           "title": "Storage Class",
           "description": "Storage class for persistent volumes (empty = default)",
           "default": ""
-        },
-        "accessModes": {
-          "type": "array",
-          "title": "Access Modes",
-          "description": "Storage access modes",
-          "items": {
-            "type": "string",
-            "enum": ["ReadWriteOnce", "ReadOnlyMany", "ReadWriteMany", "ReadWriteOncePod"]
-          },
-          "default": ["ReadWriteOnce"]
         }
       },
       "required": ["size"]

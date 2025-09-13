@@ -6,7 +6,7 @@ entries:
       licenses: Apache-2.0
     apiVersion: v2
     appVersion: "16.1"
-    created: "2025-09-13T14:16:46.64644+02:00"
+    created: "2025-09-13T14:27:11.180479+02:00"
     description: A Helm chart for CloudNative-PG PostgreSQL clusters
     digest: f1d00f44427472a186f17b3984b7e02df431138deee4cdcb31be0d958c9cbd13
     home: https://cloudnative-pg.io/
@@ -31,7 +31,7 @@ entries:
       licenses: Apache-2.0
     apiVersion: v2
     appVersion: "1.0"
-    created: "2025-09-13T14:16:46.647092+02:00"
+    created: "2025-09-13T14:27:11.181051+02:00"
     description: A Helm chart for deploying virtual machines using KubeVirt in Kubernetes
     digest: d63ca41d85be7ca1521270d96605b697166d70f714e5fe16d478c027612a0fa2
     home: https://kubevirt.io/
@@ -58,7 +58,32 @@ entries:
       licenses: Apache-2.0
     apiVersion: v2
     appVersion: "11.4"
-    created: "2025-09-13T14:16:46.649263+02:00"
+    created: "2025-09-13T14:27:11.183355+02:00"
+    description: A Helm chart for MariaDB cluster deployment using MariaDB Operator
+      CRDs
+    digest: d719ac650afc263b267c749233b92ecf1c22997579436bed7d6f412328146f9b
+    keywords:
+    - mariadb
+    - database
+    - operator
+    - galera
+    - cluster
+    maintainers:
+    - email: support@krateo.io
+      name: krateo-team
+    name: mariadb-cluster
+    sources:
+    - https://github.com/mariadb-operator/mariadb-operator
+    type: application
+    urls:
+    - https://brunseba.github.io/krateo-composition-helm/mariadb-cluster-1.0.2.tgz
+    version: 1.0.2
+  - annotations:
+      category: Database
+      licenses: Apache-2.0
+    apiVersion: v2
+    appVersion: "11.4"
+    created: "2025-09-13T14:27:11.182526+02:00"
     description: A Helm chart for MariaDB cluster deployment using MariaDB Operator
       CRDs
     digest: 752b4be0af14d54419bfe7c5e0df60ecae5ccf1066625b0621cac438c2125dc6
@@ -83,7 +108,7 @@ entries:
       licenses: Apache-2.0
     apiVersion: v2
     appVersion: "11.4"
-    created: "2025-09-13T14:16:46.648646+02:00"
+    created: "2025-09-13T14:27:11.181861+02:00"
     description: A Helm chart for MariaDB cluster deployment using MariaDB Operator
       CRDs
     digest: 7b0514b696fa99edd873ce2a5536171c7be14f297d832bbe78b8f29823facb0f
@@ -103,4 +128,4 @@ entries:
     urls:
     - https://brunseba.github.io/krateo-composition-helm/mariadb-cluster-1.0.0.tgz
     version: 1.0.0
-generated: "2025-09-13T14:16:46.645567+02:00"
+generated: "2025-09-13T14:27:11.179712+02:00"
