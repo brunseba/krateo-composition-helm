@@ -6,9 +6,9 @@ entries:
       licenses: Apache-2.0
     apiVersion: v2
     appVersion: "16.1"
-    created: "2025-09-13T12:36:22.64448+02:00"
+    created: "2025-09-13T12:57:18.067953+02:00"
     description: A Helm chart for CloudNative-PG PostgreSQL clusters
-    digest: a5074a51902e2869955754cb286b66e463a96cf4126d31b1b190962e70829732
+    digest: f1d00f44427472a186f17b3984b7e02df431138deee4cdcb31be0d958c9cbd13
     home: https://cloudnative-pg.io/
     keywords:
     - postgresql
@@ -25,4 +25,31 @@ entries:
     urls:
     - https://brunseba.github.io/krateo-composition-helm/cnpg-postgres-cluster-1.0.0.tgz
     version: 1.0.0
-generated: "2025-09-13T12:36:22.643856+02:00"
+  kubevirt-vm:
+  - annotations:
+      category: Infrastructure
+      licenses: Apache-2.0
+    apiVersion: v2
+    appVersion: "1.0"
+    created: "2025-09-13T12:57:18.06836+02:00"
+    description: A Helm chart for deploying virtual machines using KubeVirt in Kubernetes
+    digest: d63ca41d85be7ca1521270d96605b697166d70f714e5fe16d478c027612a0fa2
+    home: https://kubevirt.io/
+    icon: https://raw.githubusercontent.com/kubevirt/kubevirt/main/assets/kubevirt-icon.svg
+    keywords:
+    - virtualization
+    - vm
+    - virtual-machine
+    - kubevirt
+    - kubernetes
+    maintainers:
+    - email: platform@company.com
+      name: platform-team
+    name: kubevirt-vm
+    sources:
+    - https://github.com/kubevirt/kubevirt
+    type: application
+    urls:
+    - https://brunseba.github.io/krateo-composition-helm/kubevirt-vm-1.0.0.tgz
+    version: 1.0.0
+generated: "2025-09-13T12:57:18.067281+02:00"

@@ -1,0 +1,22 @@
+apiVersion: v2
+name: kubevirt-vm
+description: A Helm chart for deploying virtual machines using KubeVirt in Kubernetes
+version: 1.0.0
+appVersion: "1.0"
+home: https://kubevirt.io/
+icon: https://raw.githubusercontent.com/kubevirt/kubevirt/main/assets/kubevirt-icon.svg
+keywords:
+  - virtualization
+  - vm
+  - virtual-machine
+  - kubevirt
+  - kubernetes
+maintainers:
+  - name: platform-team
+    email: platform@company.com
+sources:
+  - https://github.com/kubevirt/kubevirt
+type: application
+annotations:
+  category: Infrastructure
+  licenses: Apache-2.0

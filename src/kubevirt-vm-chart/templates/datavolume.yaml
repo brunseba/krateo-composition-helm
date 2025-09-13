@@ -1,0 +1,51 @@
+{{- if eq .Values.vm.storage.rootDisk.type "dataVolume" }}
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: {{ include "kubevirt-vm.vmName" . }}-rootdisk
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kubevirt-vm.labels" . | nindent 4 }}
+    krateo.io/managed: "true"
+    krateo.io/component: "vm-storage"
+spec:
+  source:
+    registry:
+      url: docker://{{ include "kubevirt-vm.osImage" . }}
+  pvc:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: {{ .Values.vm.storage.rootDisk.size }}
+    {{- if .Values.vm.storage.rootDisk.storageClass }}
+    storageClassName: {{ .Values.vm.storage.rootDisk.storageClass }}
+    {{- end }}
+---
+{{- end }}
+
+{{- range .Values.vm.storage.dataDisks }}
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: {{ include "kubevirt-vm.vmName" $ }}-{{ .name }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    {{- include "kubevirt-vm.labels" $ | nindent 4 }}
+    krateo.io/managed: "true"
+    krateo.io/component: "vm-storage"
+    krateo.io/disk-type: "data"
+spec:
+  source:
+    blank: {}
+  pvc:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: {{ .size }}
+    {{- if .storageClass }}
+    storageClassName: {{ .storageClass }}
+    {{- end }}
+---
+{{- end }}

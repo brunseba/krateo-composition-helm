@@ -1,0 +1,134 @@
+# Default values for kubevirt-vm
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Virtual Machine Configuration
+vm:
+  name: "virtual-machine"
+  namespace: default
+  running: true
+  
+  # VM Hardware Resources
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "1"
+      
+  # Operating System Configuration
+  os:
+    # Options: linux, windows
+    type: "linux"
+    # Distribution: ubuntu, centos, fedora, debian, alpine
+    distribution: "ubuntu"
+    version: "22.04"
+    
+  # VM Network Configuration  
+  network:
+    # Network interface type: masquerade, bridge, sriov
+    type: "masquerade"
+    # Enable SSH access
+    ssh:
+      enabled: true
+      port: 22
+      # SSH public key for access
+      publicKey: ""
+      
+  # Storage Configuration
+  storage:
+    # Root disk configuration
+    rootDisk:
+      size: "20Gi"
+      storageClass: ""  # Use default storage class
+      # Storage type: containerDisk, dataVolume, persistentVolumeClaim
+      type: "dataVolume"
+      
+    # Additional data disks
+    dataDisks: []
+    # - name: data-disk-1
+    #   size: 10Gi
+    #   storageClass: ""
+    
+  # Cloud-init configuration for VM initialization
+  cloudInit:
+    # Enable cloud-init
+    enabled: true
+    # User data script
+    userData: |
+      #cloud-config
+      users:
+        - name: ubuntu
+          sudo: ALL=(ALL) NOPASSWD:ALL
+          shell: /bin/bash
+          lock_passwd: false
+          passwd: "$6$rounds=4096$saltsaltsal$L9xGMhNzSKHmI8mq9cG4V5MKnKw8SDvT/KqrH.YnWDBQkVwFRNWNJGKQP9SJZ6XC6x2y1DZJGWbB"
+      package_update: true
+      packages:
+        - qemu-guest-agent
+        - curl
+        - wget
+        - vim
+        - htop
+      runcmd:
+        - systemctl enable qemu-guest-agent
+        - systemctl start qemu-guest-agent
+        
+# Service Configuration (for VM access)
+service:
+  # Service type: ClusterIP, NodePort, LoadBalancer
+  type: NodePort
+  # SSH service
+  ssh:
+    enabled: true
+    port: 22
+    nodePort: 30022
+    
+  # HTTP service (if web server is running in VM)
+  http:
+    enabled: false
+    port: 80
+    nodePort: 30080
+    
+  # Custom ports
+  customPorts: []
+  # - name: app-port
+  #   port: 8080
+  #   nodePort: 30808
+    
+# Labels and annotations
+labels:
+  app: "virtual-machine"
+  version: "1.0"
+  
+annotations:
+  krateo.io/managed: "true"
+  
+# Node selection and affinity
+nodeSelector: {}
+
+tolerations: []
+
+affinity:
+  # Enable pod anti-affinity to spread VMs across nodes
+  enablePodAntiAffinity: false
+  topologyKey: "kubernetes.io/hostname"
+  
+# Security context
+securityContext:
+  # Run as privileged (required for KubeVirt)
+  privileged: true
+  
+# Monitoring
+monitoring:
+  enabled: true
+  # Enable VM metrics collection
+  metrics:
+    enabled: true
+    
+# Backup configuration
+backup:
+  enabled: false
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retention: "7d"

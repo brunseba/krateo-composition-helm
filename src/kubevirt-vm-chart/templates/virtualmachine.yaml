@@ -1,0 +1,141 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: {{ include "kubevirt-vm.vmName" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kubevirt-vm.labels" . | nindent 4 }}
+    krateo.io/managed: "true"
+    krateo.io/component: "virtual-machine"
+  annotations:
+    {{- range $key, $value := .Values.annotations }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+spec:
+  running: {{ .Values.vm.running }}
+  template:
+    metadata:
+      labels:
+        {{- include "kubevirt-vm.selectorLabels" . | nindent 8 }}
+        krateo.io/managed: "true"
+    spec:
+      domain:
+        {{- include "kubevirt-vm.resources" . | nindent 8 }}
+        
+        # CPU configuration
+        cpu:
+          cores: {{ .Values.vm.resources.requests.cpu | regexReplaceAll "m" "" | int | div 1000 | default 1 }}
+          
+        # Memory configuration  
+        memory:
+          guest: {{ .Values.vm.resources.requests.memory }}
+          
+        # Devices configuration
+        devices:
+          # Disk devices
+          disks:
+            - name: rootdisk
+              disk:
+                bus: virtio
+            {{- if .Values.vm.cloudInit.enabled }}
+            - name: cloudinitdisk
+              disk:
+                bus: virtio
+              serial: cloudinit
+            {{- end }}
+            {{- range .Values.vm.storage.dataDisks }}
+            - name: {{ .name }}
+              disk:
+                bus: virtio
+            {{- end }}
+            
+          # Network interfaces
+          interfaces:
+            - name: default
+              {{- if eq .Values.vm.network.type "masquerade" }}
+              masquerade: {}
+              {{- else if eq .Values.vm.network.type "bridge" }}
+              bridge: {}
+              {{- else }}
+              masquerade: {}
+              {{- end }}
+              
+        # VM features
+        features:
+          acpi:
+            enabled: true
+          apic:
+            enabled: true
+          hyperv:
+            relaxed:
+              enabled: true
+            vapic:
+              enabled: true
+            spinlocks:
+              enabled: true
+              retries: 8191
+              
+        # Machine type
+        machine:
+          type: q35
+          
+      # VM networks
+      networks:
+        - name: default
+          pod: {}
+          
+      # VM volumes
+      volumes:
+        # Root disk volume
+        - name: rootdisk
+          {{- if eq .Values.vm.storage.rootDisk.type "containerDisk" }}
+          containerDisk:
+            image: {{ include "kubevirt-vm.osImage" . }}
+          {{- else if eq .Values.vm.storage.rootDisk.type "dataVolume" }}
+          dataVolume:
+            name: {{ include "kubevirt-vm.vmName" . }}-rootdisk
+          {{- else }}
+          persistentVolumeClaim:
+            claimName: {{ include "kubevirt-vm.vmName" . }}-rootdisk
+          {{- end }}
+          
+        {{- if .Values.vm.cloudInit.enabled }}
+        # Cloud-init volume
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            userData: |
+              {{ include "kubevirt-vm.cloudInitUserData" . | nindent 14 }}
+        {{- end }}
+        
+        {{- range .Values.vm.storage.dataDisks }}
+        # Data disk volumes
+        - name: {{ .name }}
+          dataVolume:
+            name: {{ include "kubevirt-vm.vmName" $ }}-{{ .name }}
+        {{- end }}
+        
+      # VM scheduling
+      {{- if .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
+      {{- end }}
+      
+      {{- if .Values.tolerations }}
+      tolerations:
+        {{- toYaml .Values.tolerations | nindent 8 }}
+      {{- end }}
+      
+      {{- if .Values.affinity.enablePodAntiAffinity }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                  - {{ include "kubevirt-vm.name" . }}
+              topologyKey: {{ .Values.affinity.topologyKey }}
+      {{- end }}

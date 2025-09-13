@@ -1,0 +1,45 @@
+{{- if or .Values.service.ssh.enabled .Values.service.http.enabled (len .Values.service.customPorts) }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "kubevirt-vm.vmName" . }}-service
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kubevirt-vm.labels" . | nindent 4 }}
+    krateo.io/managed: "true"
+    krateo.io/component: "vm-service"
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    {{- include "kubevirt-vm.selectorLabels" . | nindent 4 }}
+  ports:
+    {{- if .Values.service.ssh.enabled }}
+    - name: ssh
+      port: {{ .Values.service.ssh.port }}
+      targetPort: {{ .Values.service.ssh.port }}
+      protocol: TCP
+      {{- if and (eq .Values.service.type "NodePort") .Values.service.ssh.nodePort }}
+      nodePort: {{ .Values.service.ssh.nodePort }}
+      {{- end }}
+    {{- end }}
+    
+    {{- if .Values.service.http.enabled }}
+    - name: http
+      port: {{ .Values.service.http.port }}
+      targetPort: {{ .Values.service.http.port }}
+      protocol: TCP
+      {{- if and (eq .Values.service.type "NodePort") .Values.service.http.nodePort }}
+      nodePort: {{ .Values.service.http.nodePort }}
+      {{- end }}
+    {{- end }}
+    
+    {{- range .Values.service.customPorts }}
+    - name: {{ .name }}
+      port: {{ .port }}
+      targetPort: {{ .port }}
+      protocol: {{ .protocol | default "TCP" }}
+      {{- if and (eq $.Values.service.type "NodePort") .nodePort }}
+      nodePort: {{ .nodePort }}
+      {{- end }}
+    {{- end }}
+{{- end }}

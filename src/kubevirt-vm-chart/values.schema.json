@@ -1,0 +1,411 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "KubeVirt Virtual Machine Configuration",
+  "description": "Configuration schema for deploying virtual machines using KubeVirt in Kubernetes",
+  "properties": {
+    "vm": {
+      "type": "object",
+      "title": "Virtual Machine Configuration",
+      "description": "Core VM settings and specifications",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "VM Name",
+          "description": "Name of the virtual machine",
+          "default": "virtual-machine",
+          "pattern": "^[a-z0-9-]+$",
+          "minLength": 3,
+          "maxLength": 50
+        },
+        "running": {
+          "type": "boolean",
+          "title": "VM Running State",
+          "description": "Whether the VM should be running after creation",
+          "default": true
+        },
+        "resources": {
+          "type": "object",
+          "title": "Resource Configuration",
+          "description": "CPU and memory resource allocation",
+          "properties": {
+            "requests": {
+              "type": "object",
+              "title": "Resource Requests",
+              "description": "Minimum resource allocation",
+              "properties": {
+                "memory": {
+                  "type": "string",
+                  "title": "Memory Request",
+                  "description": "Minimum memory allocation for the VM",
+                  "default": "1Gi",
+                  "pattern": "^[0-9]+(Mi|Gi)$"
+                },
+                "cpu": {
+                  "type": "string",
+                  "title": "CPU Request",
+                  "description": "Minimum CPU allocation for the VM",
+                  "default": "500m",
+                  "pattern": "^[0-9]+m?$"
+                }
+              },
+              "required": ["memory", "cpu"]
+            },
+            "limits": {
+              "type": "object",
+              "title": "Resource Limits",
+              "description": "Maximum resource allocation",
+              "properties": {
+                "memory": {
+                  "type": "string",
+                  "title": "Memory Limit",
+                  "description": "Maximum memory allocation for the VM",
+                  "default": "2Gi",
+                  "pattern": "^[0-9]+(Mi|Gi)$"
+                },
+                "cpu": {
+                  "type": "string",
+                  "title": "CPU Limit",
+                  "description": "Maximum CPU allocation for the VM",
+                  "default": "1",
+                  "pattern": "^[0-9]+m?$"
+                }
+              },
+              "required": ["memory", "cpu"]
+            }
+          },
+          "required": ["requests", "limits"]
+        },
+        "os": {
+          "type": "object",
+          "title": "Operating System Configuration",
+          "description": "VM operating system settings",
+          "properties": {
+            "type": {
+              "type": "string",
+              "title": "OS Type",
+              "description": "Type of operating system",
+              "default": "linux",
+              "enum": ["linux", "windows"]
+            },
+            "distribution": {
+              "type": "string",
+              "title": "OS Distribution",
+              "description": "Linux distribution or Windows version",
+              "default": "ubuntu",
+              "enum": ["ubuntu", "centos", "fedora", "debian", "alpine", "windows-server"]
+            },
+            "version": {
+              "type": "string",
+              "title": "OS Version",
+              "description": "Version of the operating system",
+              "default": "22.04"
+            }
+          },
+          "required": ["type", "distribution"]
+        },
+        "network": {
+          "type": "object",
+          "title": "Network Configuration",
+          "description": "VM network settings",
+          "properties": {
+            "type": {
+              "type": "string",
+              "title": "Network Type",
+              "description": "Type of network interface",
+              "default": "masquerade",
+              "enum": ["masquerade", "bridge", "sriov"]
+            },
+            "ssh": {
+              "type": "object",
+              "title": "SSH Configuration",
+              "description": "SSH access settings",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "title": "Enable SSH",
+                  "description": "Enable SSH access to the VM",
+                  "default": true
+                },
+                "port": {
+                  "type": "integer",
+                  "title": "SSH Port",
+                  "description": "Port for SSH access",
+                  "default": 22,
+                  "minimum": 1,
+                  "maximum": 65535
+                },
+                "publicKey": {
+                  "type": "string",
+                  "title": "SSH Public Key",
+                  "description": "SSH public key for authentication (optional)"
+                }
+              }
+            }
+          }
+        },
+        "storage": {
+          "type": "object",
+          "title": "Storage Configuration",
+          "description": "VM storage and disk settings",
+          "properties": {
+            "rootDisk": {
+              "type": "object",
+              "title": "Root Disk Configuration",
+              "description": "Configuration for the VM's root disk",
+              "properties": {
+                "size": {
+                  "type": "string",
+                  "title": "Root Disk Size",
+                  "description": "Size of the root disk",
+                  "default": "20Gi",
+                  "pattern": "^[0-9]+(Mi|Gi)$"
+                },
+                "storageClass": {
+                  "type": "string",
+                  "title": "Storage Class",
+                  "description": "Storage class for root disk (empty for default)",
+                  "default": ""
+                },
+                "type": {
+                  "type": "string",
+                  "title": "Disk Type",
+                  "description": "Type of root disk storage",
+                  "default": "dataVolume",
+                  "enum": ["containerDisk", "dataVolume", "persistentVolumeClaim"]
+                }
+              },
+              "required": ["size", "type"]
+            },
+            "dataDisks": {
+              "type": "array",
+              "title": "Additional Data Disks",
+              "description": "Additional storage volumes for the VM",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "title": "Disk Name",
+                    "description": "Name of the data disk",
+                    "pattern": "^[a-z0-9-]+$"
+                  },
+                  "size": {
+                    "type": "string",
+                    "title": "Disk Size",
+                    "description": "Size of the data disk",
+                    "pattern": "^[0-9]+(Mi|Gi)$"
+                  },
+                  "storageClass": {
+                    "type": "string",
+                    "title": "Storage Class",
+                    "description": "Storage class for data disk"
+                  }
+                },
+                "required": ["name", "size"]
+              }
+            }
+          },
+          "required": ["rootDisk"]
+        },
+        "cloudInit": {
+          "type": "object",
+          "title": "Cloud-Init Configuration",
+          "description": "VM initialization settings",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "title": "Enable Cloud-Init",
+              "description": "Enable cloud-init for VM initialization",
+              "default": true
+            },
+            "userData": {
+              "type": "string",
+              "title": "User Data Script",
+              "description": "Cloud-init user data script for VM setup",
+              "format": "textarea"
+            }
+          }
+        }
+      },
+      "required": ["name", "resources", "os", "storage"]
+    },
+    "service": {
+      "type": "object",
+      "title": "Service Configuration",
+      "description": "Network services for VM access",
+      "properties": {
+        "type": {
+          "type": "string",
+          "title": "Service Type",
+          "description": "Kubernetes service type for VM access",
+          "default": "NodePort",
+          "enum": ["ClusterIP", "NodePort", "LoadBalancer"]
+        },
+        "ssh": {
+          "type": "object",
+          "title": "SSH Service",
+          "description": "SSH access service configuration",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "title": "Enable SSH Service",
+              "description": "Create a service for SSH access",
+              "default": true
+            },
+            "port": {
+              "type": "integer",
+              "title": "SSH Service Port",
+              "description": "Port for SSH service",
+              "default": 22,
+              "minimum": 1,
+              "maximum": 65535
+            },
+            "nodePort": {
+              "type": "integer",
+              "title": "SSH NodePort",
+              "description": "NodePort for SSH access (when using NodePort service)",
+              "default": 30022,
+              "minimum": 30000,
+              "maximum": 32767
+            }
+          }
+        },
+        "http": {
+          "type": "object",
+          "title": "HTTP Service",
+          "description": "HTTP access service configuration",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "title": "Enable HTTP Service",
+              "description": "Create a service for HTTP access",
+              "default": false
+            },
+            "port": {
+              "type": "integer",
+              "title": "HTTP Service Port",
+              "description": "Port for HTTP service",
+              "default": 80,
+              "minimum": 1,
+              "maximum": 65535
+            },
+            "nodePort": {
+              "type": "integer",
+              "title": "HTTP NodePort",
+              "description": "NodePort for HTTP access (when using NodePort service)",
+              "default": 30080,
+              "minimum": 30000,
+              "maximum": 32767
+            }
+          }
+        }
+      }
+    },
+    "labels": {
+      "type": "object",
+      "title": "Custom Labels",
+      "description": "Additional labels for VM resources",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "annotations": {
+      "type": "object",
+      "title": "Custom Annotations",
+      "description": "Additional annotations for VM resources",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "nodeSelector": {
+      "type": "object",
+      "title": "Node Selector",
+      "description": "Node selection constraints for VM placement",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "tolerations": {
+      "type": "array",
+      "title": "Tolerations",
+      "description": "Pod tolerations for VM scheduling",
+      "items": {
+        "type": "object"
+      }
+    },
+    "affinity": {
+      "type": "object",
+      "title": "Affinity Configuration",
+      "description": "VM scheduling affinity settings",
+      "properties": {
+        "enablePodAntiAffinity": {
+          "type": "boolean",
+          "title": "Enable Pod Anti-Affinity",
+          "description": "Spread VMs across different nodes",
+          "default": false
+        },
+        "topologyKey": {
+          "type": "string",
+          "title": "Topology Key",
+          "description": "Kubernetes topology key for anti-affinity",
+          "default": "kubernetes.io/hostname"
+        }
+      }
+    },
+    "monitoring": {
+      "type": "object",
+      "title": "Monitoring Configuration",
+      "description": "VM monitoring and metrics settings",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "title": "Enable Monitoring",
+          "description": "Enable monitoring for the VM",
+          "default": true
+        },
+        "metrics": {
+          "type": "object",
+          "title": "Metrics Configuration",
+          "description": "VM metrics collection settings",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "title": "Enable Metrics",
+              "description": "Enable metrics collection",
+              "default": true
+            }
+          }
+        }
+      }
+    },
+    "backup": {
+      "type": "object",
+      "title": "Backup Configuration",
+      "description": "VM backup and snapshot settings",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "title": "Enable Backup",
+          "description": "Enable automated VM backups",
+          "default": false
+        },
+        "schedule": {
+          "type": "string",
+          "title": "Backup Schedule",
+          "description": "Cron schedule for automated backups",
+          "default": "0 2 * * *",
+          "pattern": "^([0-9,\\-\\*\\/]+\\s+){4}[0-9,\\-\\*\\/]+$"
+        },
+        "retention": {
+          "type": "string",
+          "title": "Backup Retention",
+          "description": "How long to keep backup snapshots",
+          "default": "7d",
+          "pattern": "^[0-9]+(d|w|m)$"
+        }
+      }
+    }
+  },
+  "required": ["vm"]
+}
