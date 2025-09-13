@@ -1,0 +1,285 @@
+# Default values for mariadb-cluster.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Global settings
+nameOverride: ""
+fullnameOverride: ""
+
+# MariaDB cluster configuration
+cluster:
+  name: "mariadb"
+  replicas: 3
+  labels: {}
+  annotations: {}
+
+# MariaDB image configuration
+image:
+  registry: ""
+  repository: "mariadb"
+  tag: ""  # Uses Chart.AppVersion if not specified
+  pullPolicy: "IfNotPresent"
+  pullSecrets: []
+
+# Database and user configuration
+database: "mariadb"
+username: "mariadb"
+
+# Password configuration
+rootPassword:
+  generate: true
+  existingSecret:
+    name: ""
+    key: "password"
+
+userPassword:
+  generate: true
+  existingSecret:
+    name: ""
+    key: "password"
+
+# Galera cluster configuration (High Availability)
+galera:
+  enabled: true
+  primary:
+    podIndex: 0
+    automaticFailover: true
+  sst: "mariabackup"
+  replicaThreads: 1
+  agent:
+    port: 9091
+    kubernetesAuth:
+      enabled: true
+    gracefulShutdownTimeout: "5s"
+  recovery:
+    enabled: true
+    minClusterSize: "50%"
+    clusterHealthyTimeout: "30s"
+    clusterBootstrapTimeout: "10m"
+    podRecoveryTimeout: "5m"
+    podSyncTimeout: "5m"
+  initContainer:
+    image:
+      repository: "busybox"
+      tag: "1.35.0"
+      pullPolicy: "IfNotPresent"
+  config:
+    reuseStorageVolume: false
+    volumeClaimTemplate:
+      resources:
+        requests:
+          storage: "300Mi"
+      accessModes:
+        - "ReadWriteOnce"
+
+# Storage configuration
+storage:
+  size: "10Gi"
+  storageClassName: ""
+  accessModes:
+    - "ReadWriteOnce"
+  volumeClaimTemplate: {}
+
+# Resource requests and limits
+resources:
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+  limits:
+    cpu: "300m"
+    memory: "512Mi"
+
+# Service configuration
+service:
+  type: "ClusterIP"
+  annotations: {}
+  loadBalancerIP: ""
+  nodePort: ""
+  
+  # Primary service (read-write)
+  primary:
+    type: "ClusterIP"
+    annotations: {}
+    loadBalancerIP: ""
+    nodePort: ""
+    
+  # Secondary service (read-only)
+  secondary:
+    type: "ClusterIP"
+    annotations: {}
+    loadBalancerIP: ""
+    nodePort: ""
+
+# Connection secrets configuration
+connection:
+  enabled: true
+  secretTemplate:
+    key: "dsn"
+    databaseKey: "database"
+    usernameKey: "username"
+    passwordKey: "password"
+    hostKey: "host"
+    portKey: "port"
+
+primaryConnection:
+  enabled: true
+  secretTemplate:
+    key: "dsn"
+
+secondaryConnection:
+  enabled: true
+  secretTemplate:
+    key: "dsn"
+
+# MariaDB configuration (my.cnf)
+myCnf: |
+  [mariadb]
+  bind-address=*
+  default_storage_engine=InnoDB
+  binlog_format=row
+  innodb_autoinc_lock_mode=2
+  innodb_buffer_pool_size=128M
+  max_allowed_packet=256M
+  
+  # Galera cluster settings
+  wsrep_on=ON
+  wsrep_cluster_name="mariadb-galera-cluster"
+  wsrep_cluster_address="gcomm://"
+  wsrep_sst_method=mariabackup
+  wsrep_provider=/usr/lib/galera/libgalera_smm.so
+  wsrep_slave_threads=1
+  wsrep_certify_nonPK=1
+  wsrep_max_ws_rows=131072
+  wsrep_max_ws_size=1073741824
+  wsrep_debug=0
+  wsrep_convert_LOCK_to_trx=0
+  wsrep_retry_autocommit=1
+  wsrep_auto_increment_control=1
+  
+  # InnoDB settings for Galera
+  innodb_flush_log_at_trx_commit=2
+  innodb_locks_unsafe_for_binlog=1
+
+# Alternative: Use ConfigMap for my.cnf
+myCnfConfigMapKeyRef: {}
+  # name: "mariadb-config"
+  # key: "my.cnf"
+
+# Update strategy
+updateStrategy:
+  type: "ReplicasFirstPrimaryLast"
+
+# Pod Security Context
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 999
+  runAsGroup: 999
+  fsGroup: 999
+
+# Security Context
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 999
+  runAsGroup: 999
+  capabilities:
+    drop:
+      - ALL
+    add:
+      - CHOWN
+      - SETUID
+      - SETGID
+
+# Service account
+serviceAccount:
+  create: false
+  name: ""
+
+# Node assignment
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: "app.kubernetes.io/name"
+                operator: In
+                values:
+                  - "mariadb-cluster"
+          topologyKey: "kubernetes.io/hostname"
+
+# Topology spread constraints
+topologySpreadConstraints: []
+
+# Metrics and monitoring
+metrics:
+  enabled: true
+  exporter:
+    image:
+      registry: "docker.io"
+      repository: "prom/mysqld-exporter"
+      tag: "v0.15.1"
+    resources:
+      requests:
+        cpu: "10m"
+        memory: "32Mi"
+      limits:
+        cpu: "100m"
+        memory: "128Mi"
+    port: 9104
+  
+  passwordSecretKeyRef:
+    generate: true
+    existingSecret:
+      name: ""
+      key: "password"
+  
+  serviceMonitor:
+    enabled: false
+    prometheusRelease: "kube-prometheus-stack"
+    interval: "30s"
+    scrapeTimeout: "10s"
+    additionalLabels: {}
+
+# Environment variables
+env: []
+  # - name: "CUSTOM_ENV_VAR"
+  #   value: "custom_value"
+
+envFrom: []
+  # - configMapRef:
+  #     name: "mariadb-config"
+  # - secretRef:
+  #     name: "mariadb-secret"
+
+# Volume mounts
+volumeMounts: []
+  # - name: "custom-config"
+  #   mountPath: "/etc/mysql/conf.d"
+  #   readOnly: true
+
+# Volumes
+volumes: []
+  # - name: "custom-config"
+  #   configMap:
+  #     name: "mariadb-custom-config"
+
+# Init containers
+initContainers: []
+  # - name: "init-db"
+  #   image: "busybox:1.35.0"
+  #   command: ["sh", "-c", "echo 'Initializing database...'"]
+
+# Sidecar containers
+sidecarContainers: []
+  # - name: "log-shipper"
+  #   image: "fluent/fluent-bit:2.0.0"
+  #   command: ["fluent-bit", "-c", "/fluent-bit/etc/fluent-bit.conf"]

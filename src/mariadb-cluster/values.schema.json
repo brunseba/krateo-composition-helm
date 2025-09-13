@@ -1,0 +1,440 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "MariaDB Cluster Configuration",
+  "description": "Configure a high-available MariaDB cluster with Galera replication using the MariaDB operator",
+  "properties": {
+    "nameOverride": {
+      "type": "string",
+      "title": "Name Override",
+      "description": "Override the name of the chart",
+      "default": ""
+    },
+    "fullnameOverride": {
+      "type": "string",
+      "title": "Full Name Override", 
+      "description": "Override the full name of the chart",
+      "default": ""
+    },
+    "cluster": {
+      "type": "object",
+      "title": "Cluster Configuration",
+      "description": "Core MariaDB cluster settings",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Cluster Name",
+          "description": "Name of the MariaDB cluster",
+          "default": "mariadb",
+          "pattern": "^[a-z0-9]([a-z0-9-]*[a-z0-9])?$"
+        },
+        "replicas": {
+          "type": "integer",
+          "title": "Number of Replicas",
+          "description": "Number of MariaDB cluster nodes (minimum 3 recommended for Galera)",
+          "default": 3,
+          "minimum": 1,
+          "maximum": 9
+        },
+        "labels": {
+          "type": "object",
+          "title": "Additional Labels",
+          "description": "Additional labels to apply to cluster resources",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "annotations": {
+          "type": "object", 
+          "title": "Additional Annotations",
+          "description": "Additional annotations to apply to cluster resources",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "required": ["name", "replicas"]
+    },
+    "image": {
+      "type": "object",
+      "title": "Container Image",
+      "description": "MariaDB container image configuration",
+      "properties": {
+        "registry": {
+          "type": "string",
+          "title": "Image Registry",
+          "description": "Container image registry (optional)",
+          "default": ""
+        },
+        "repository": {
+          "type": "string",
+          "title": "Image Repository",
+          "description": "MariaDB image repository",
+          "default": "mariadb"
+        },
+        "tag": {
+          "type": "string",
+          "title": "Image Tag",
+          "description": "MariaDB image tag (defaults to Chart.AppVersion)",
+          "default": ""
+        },
+        "pullPolicy": {
+          "type": "string",
+          "title": "Image Pull Policy",
+          "description": "Container image pull policy",
+          "default": "IfNotPresent",
+          "enum": ["Always", "IfNotPresent", "Never"]
+        }
+      },
+      "required": ["repository", "pullPolicy"]
+    },
+    "database": {
+      "type": "string",
+      "title": "Database Name",
+      "description": "Name of the default database to create",
+      "default": "mariadb",
+      "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$"
+    },
+    "username": {
+      "type": "string", 
+      "title": "Database Username",
+      "description": "Username for the default database user",
+      "default": "mariadb",
+      "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$"
+    },
+    "rootPassword": {
+      "type": "object",
+      "title": "Root Password Configuration",
+      "description": "Configure MariaDB root password",
+      "properties": {
+        "generate": {
+          "type": "boolean",
+          "title": "Auto-generate Password",
+          "description": "Automatically generate a secure root password",
+          "default": true
+        },
+        "existingSecret": {
+          "type": "object",
+          "title": "Existing Secret",
+          "description": "Use password from existing Kubernetes secret",
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "Secret Name",
+              "description": "Name of existing secret containing root password"
+            },
+            "key": {
+              "type": "string", 
+              "title": "Secret Key",
+              "description": "Key within secret containing root password",
+              "default": "password"
+            }
+          }
+        }
+      }
+    },
+    "userPassword": {
+      "type": "object", 
+      "title": "User Password Configuration",
+      "description": "Configure database user password",
+      "properties": {
+        "generate": {
+          "type": "boolean",
+          "title": "Auto-generate Password",
+          "description": "Automatically generate a secure user password", 
+          "default": true
+        },
+        "existingSecret": {
+          "type": "object",
+          "title": "Existing Secret",
+          "description": "Use password from existing Kubernetes secret",
+          "properties": {
+            "name": {
+              "type": "string",
+              "title": "Secret Name",
+              "description": "Name of existing secret containing user password"
+            },
+            "key": {
+              "type": "string",
+              "title": "Secret Key", 
+              "description": "Key within secret containing user password",
+              "default": "password"
+            }
+          }
+        }
+      }
+    },
+    "galera": {
+      "type": "object",
+      "title": "Galera Cluster Configuration",
+      "description": "High availability clustering with Galera",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "title": "Enable Galera",
+          "description": "Enable Galera clustering for high availability",
+          "default": true
+        },
+        "sst": {
+          "type": "string",
+          "title": "State Snapshot Transfer Method", 
+          "description": "Method used for state snapshot transfer between nodes",
+          "default": "mariabackup",
+          "enum": ["mariabackup", "rsync", "mysqldump"]
+        },
+        "replicaThreads": {
+          "type": "integer",
+          "title": "Replica Threads",
+          "description": "Number of replica threads for parallel replication",
+          "default": 1,
+          "minimum": 1,
+          "maximum": 8
+        }
+      }
+    },
+    "storage": {
+      "type": "object",
+      "title": "Storage Configuration", 
+      "description": "Persistent storage settings for MariaDB data",
+      "properties": {
+        "size": {
+          "type": "string",
+          "title": "Storage Size",
+          "description": "Size of persistent volume for MariaDB data",
+          "default": "10Gi",
+          "pattern": "^[0-9]+(Ei|Pi|Ti|Gi|Mi|Ki|E|P|T|G|M|K)?$"
+        },
+        "storageClassName": {
+          "type": "string",
+          "title": "Storage Class",
+          "description": "Storage class for persistent volumes (empty = default)",
+          "default": ""
+        },
+        "accessModes": {
+          "type": "array",
+          "title": "Access Modes",
+          "description": "Storage access modes",
+          "default": ["ReadWriteOnce"],
+          "items": {
+            "type": "string",
+            "enum": ["ReadWriteOnce", "ReadOnlyMany", "ReadWriteMany", "ReadWriteOncePod"]
+          }
+        }
+      },
+      "required": ["size"]
+    },
+    "resources": {
+      "type": "object",
+      "title": "Resource Requirements",
+      "description": "CPU and memory resource limits and requests",
+      "properties": {
+        "requests": {
+          "type": "object",
+          "title": "Resource Requests",
+          "description": "Minimum resources guaranteed for each pod",
+          "properties": {
+            "cpu": {
+              "type": "string", 
+              "title": "CPU Request",
+              "description": "Minimum CPU required (e.g., 100m, 0.5)",
+              "default": "100m",
+              "pattern": "^[0-9]+(m|[0-9]*\\.?[0-9]*)?$"
+            },
+            "memory": {
+              "type": "string",
+              "title": "Memory Request", 
+              "description": "Minimum memory required (e.g., 128Mi, 1Gi)",
+              "default": "128Mi",
+              "pattern": "^[0-9]+(Ei|Pi|Ti|Gi|Mi|Ki|E|P|T|G|M|K)?$"
+            }
+          }
+        },
+        "limits": {
+          "type": "object",
+          "title": "Resource Limits",
+          "description": "Maximum resources allowed for each pod",
+          "properties": {
+            "cpu": {
+              "type": "string",
+              "title": "CPU Limit", 
+              "description": "Maximum CPU allowed (e.g., 300m, 1)",
+              "default": "300m",
+              "pattern": "^[0-9]+(m|[0-9]*\\.?[0-9]*)?$"
+            },
+            "memory": {
+              "type": "string",
+              "title": "Memory Limit",
+              "description": "Maximum memory allowed (e.g., 512Mi, 2Gi)",
+              "default": "512Mi",
+              "pattern": "^[0-9]+(Ei|Pi|Ti|Gi|Mi|Ki|E|P|T|G|M|K)?$"
+            }
+          }
+        }
+      }
+    },
+    "service": {
+      "type": "object",
+      "title": "Service Configuration",
+      "description": "Kubernetes service settings for database access",
+      "properties": {
+        "type": {
+          "type": "string",
+          "title": "Service Type",
+          "description": "Type of Kubernetes service",
+          "default": "ClusterIP",
+          "enum": ["ClusterIP", "NodePort", "LoadBalancer"]
+        },
+        "primary": {
+          "type": "object",
+          "title": "Primary Service", 
+          "description": "Service for read-write access to primary node",
+          "properties": {
+            "type": {
+              "type": "string",
+              "title": "Primary Service Type",
+              "description": "Service type for primary (read-write) access",
+              "default": "ClusterIP",
+              "enum": ["ClusterIP", "NodePort", "LoadBalancer"]
+            }
+          }
+        },
+        "secondary": {
+          "type": "object",
+          "title": "Secondary Service",
+          "description": "Service for read-only access to replica nodes",
+          "properties": {
+            "type": {
+              "type": "string", 
+              "title": "Secondary Service Type",
+              "description": "Service type for secondary (read-only) access",
+              "default": "ClusterIP",
+              "enum": ["ClusterIP", "NodePort", "LoadBalancer"]
+            }
+          }
+        }
+      }
+    },
+    "connection": {
+      "type": "object",
+      "title": "Connection Configuration",
+      "description": "Database connection settings and secrets",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "title": "Enable Connection Secrets",
+          "description": "Create connection secrets with database connection details",
+          "default": true
+        }
+      }
+    },
+    "primaryConnection": {
+      "type": "object",
+      "title": "Primary Connection",
+      "description": "Connection configuration for primary (read-write) access",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "title": "Enable Primary Connection Secret",
+          "description": "Create connection secret for primary database access",
+          "default": true
+        }
+      }
+    },
+    "secondaryConnection": {
+      "type": "object", 
+      "title": "Secondary Connection",
+      "description": "Connection configuration for secondary (read-only) access",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "title": "Enable Secondary Connection Secret",
+          "description": "Create connection secret for secondary database access", 
+          "default": true
+        }
+      }
+    },
+    "myCnf": {
+      "type": "string",
+      "title": "MariaDB Configuration (my.cnf)",
+      "description": "Custom MariaDB configuration in my.cnf format",
+      "format": "textarea",
+      "default": "[mariadb]\nbind-address=*\ndefault_storage_engine=InnoDB\nbinlog_format=row\ninnodb_autoinc_lock_mode=2\ninnodb_buffer_pool_size=128M\nmax_allowed_packet=256M"
+    },
+    "updateStrategy": {
+      "type": "object",
+      "title": "Update Strategy",
+      "description": "Strategy for updating MariaDB cluster nodes",
+      "properties": {
+        "type": {
+          "type": "string",
+          "title": "Update Strategy Type",
+          "description": "How to perform updates across cluster nodes",
+          "default": "ReplicasFirstPrimaryLast",
+          "enum": ["ReplicasFirstPrimaryLast", "RollingUpdate", "OnDelete"]
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "title": "Metrics and Monitoring", 
+      "description": "Enable Prometheus metrics collection",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "title": "Enable Metrics",
+          "description": "Enable Prometheus metrics exporter",
+          "default": true
+        },
+        "serviceMonitor": {
+          "type": "object",
+          "title": "Service Monitor",
+          "description": "Prometheus ServiceMonitor configuration",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "title": "Enable Service Monitor",
+              "description": "Create Prometheus ServiceMonitor for automatic scraping",
+              "default": false
+            },
+            "interval": {
+              "type": "string",
+              "title": "Scrape Interval",
+              "description": "How often to scrape metrics (e.g., 30s, 1m)",
+              "default": "30s",
+              "pattern": "^[0-9]+(ns|us|µs|ms|s|m|h)$"
+            },
+            "scrapeTimeout": {
+              "type": "string",
+              "title": "Scrape Timeout", 
+              "description": "Timeout for metrics scraping (e.g., 10s)",
+              "default": "10s",
+              "pattern": "^[0-9]+(ns|us|µs|ms|s|m|h)$"
+            }
+          }
+        }
+      }
+    },
+    "affinity": {
+      "type": "object",
+      "title": "Pod Affinity/Anti-Affinity",
+      "description": "Control pod scheduling preferences"
+    },
+    "nodeSelector": {
+      "type": "object",
+      "title": "Node Selector",
+      "description": "Select nodes for pod scheduling",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "tolerations": {
+      "type": "array",
+      "title": "Tolerations", 
+      "description": "Allow pods to be scheduled on nodes with matching taints",
+      "items": {
+        "type": "object"
+      }
+    }
+  },
+  "required": ["cluster", "image", "database", "username"]
+}

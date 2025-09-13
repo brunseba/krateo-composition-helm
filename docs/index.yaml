@@ -6,7 +6,7 @@ entries:
       licenses: Apache-2.0
     apiVersion: v2
     appVersion: "16.1"
-    created: "2025-09-13T12:57:18.067953+02:00"
+    created: "2025-09-13T13:51:38.136775+02:00"
     description: A Helm chart for CloudNative-PG PostgreSQL clusters
     digest: f1d00f44427472a186f17b3984b7e02df431138deee4cdcb31be0d958c9cbd13
     home: https://cloudnative-pg.io/
@@ -31,7 +31,7 @@ entries:
       licenses: Apache-2.0
     apiVersion: v2
     appVersion: "1.0"
-    created: "2025-09-13T12:57:18.06836+02:00"
+    created: "2025-09-13T13:51:38.137296+02:00"
     description: A Helm chart for deploying virtual machines using KubeVirt in Kubernetes
     digest: d63ca41d85be7ca1521270d96605b697166d70f714e5fe16d478c027612a0fa2
     home: https://kubevirt.io/
@@ -52,4 +52,30 @@ entries:
     urls:
     - https://brunseba.github.io/krateo-composition-helm/kubevirt-vm-1.0.0.tgz
     version: 1.0.0
-generated: "2025-09-13T12:57:18.067281+02:00"
+  mariadb-cluster:
+  - annotations:
+      category: Database
+      licenses: Apache-2.0
+    apiVersion: v2
+    appVersion: "11.4"
+    created: "2025-09-13T13:51:38.138064+02:00"
+    description: A Helm chart for MariaDB cluster deployment using MariaDB Operator
+      CRDs
+    digest: 0ac6f506cd95c79130d3ad60c74adcf74a9b2add8d5c6cb1aaf55d116b7f5b1a
+    keywords:
+    - mariadb
+    - database
+    - operator
+    - galera
+    - cluster
+    maintainers:
+    - email: support@krateo.io
+      name: krateo-team
+    name: mariadb-cluster
+    sources:
+    - https://github.com/mariadb-operator/mariadb-operator
+    type: application
+    urls:
+    - https://brunseba.github.io/krateo-composition-helm/mariadb-cluster-1.0.0.tgz
+    version: 1.0.0
+generated: "2025-09-13T13:51:38.135884+02:00"

@@ -1,0 +1,20 @@
+apiVersion: v2
+name: mariadb-cluster
+description: A Helm chart for MariaDB cluster deployment using MariaDB Operator CRDs
+type: application
+version: 1.0.0
+appVersion: "11.4"
+maintainers:
+  - name: krateo-team
+    email: support@krateo.io
+keywords:
+  - mariadb
+  - database
+  - operator
+  - galera
+  - cluster
+sources:
+  - https://github.com/mariadb-operator/mariadb-operator
+annotations:
+  category: Database
+  licenses: Apache-2.0
