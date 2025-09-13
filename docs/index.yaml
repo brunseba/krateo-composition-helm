@@ -6,7 +6,7 @@ entries:
       licenses: Apache-2.0
     apiVersion: v2
     appVersion: "16.1"
-    created: "2025-09-13T13:51:38.136775+02:00"
+    created: "2025-09-13T13:56:13.708982+02:00"
     description: A Helm chart for CloudNative-PG PostgreSQL clusters
     digest: f1d00f44427472a186f17b3984b7e02df431138deee4cdcb31be0d958c9cbd13
     home: https://cloudnative-pg.io/
@@ -31,7 +31,7 @@ entries:
       licenses: Apache-2.0
     apiVersion: v2
     appVersion: "1.0"
-    created: "2025-09-13T13:51:38.137296+02:00"
+    created: "2025-09-13T13:56:13.709541+02:00"
     description: A Helm chart for deploying virtual machines using KubeVirt in Kubernetes
     digest: d63ca41d85be7ca1521270d96605b697166d70f714e5fe16d478c027612a0fa2
     home: https://kubevirt.io/
@@ -58,10 +58,10 @@ entries:
       licenses: Apache-2.0
     apiVersion: v2
     appVersion: "11.4"
-    created: "2025-09-13T13:51:38.138064+02:00"
+    created: "2025-09-13T13:56:13.710012+02:00"
     description: A Helm chart for MariaDB cluster deployment using MariaDB Operator
       CRDs
-    digest: 0ac6f506cd95c79130d3ad60c74adcf74a9b2add8d5c6cb1aaf55d116b7f5b1a
+    digest: 7b0514b696fa99edd873ce2a5536171c7be14f297d832bbe78b8f29823facb0f
     keywords:
     - mariadb
     - database
@@ -78,4 +78,4 @@ entries:
     urls:
     - https://brunseba.github.io/krateo-composition-helm/mariadb-cluster-1.0.0.tgz
     version: 1.0.0
-generated: "2025-09-13T13:51:38.135884+02:00"
+generated: "2025-09-13T13:56:13.708132+02:00"
