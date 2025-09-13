@@ -1,0 +1,418 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "CNPG PostgreSQL Cluster Configuration",
+  "description": "Configuration schema for CloudNativePG PostgreSQL cluster deployment",
+  "properties": {
+    "cluster": {
+      "type": "object",
+      "title": "Cluster Configuration",
+      "description": "PostgreSQL cluster settings",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Cluster Name",
+          "description": "Name of the PostgreSQL cluster",
+          "default": "postgres-cluster",
+          "pattern": "^[a-z0-9-]+$",
+          "minLength": 3,
+          "maxLength": 50
+        },
+        "instances": {
+          "type": "integer",
+          "title": "Number of Instances",
+          "description": "Number of PostgreSQL instances in the cluster",
+          "default": 3,
+          "minimum": 1,
+          "maximum": 10
+        },
+        "primaryUpdateStrategy": {
+          "type": "string",
+          "title": "Update Strategy",
+          "description": "Strategy for updating the primary instance",
+          "default": "unsupervised",
+          "enum": ["unsupervised", "supervised"]
+        },
+        "postgresql": {
+          "type": "object",
+          "title": "PostgreSQL Configuration",
+          "description": "PostgreSQL server parameters",
+          "properties": {
+            "parameters": {
+              "type": "object",
+              "title": "PostgreSQL Parameters",
+              "description": "PostgreSQL configuration parameters",
+              "properties": {
+                "max_connections": {
+                  "type": "string",
+                  "title": "Max Connections",
+                  "description": "Maximum number of client connections",
+                  "default": "200",
+                  "pattern": "^[0-9]+$"
+                },
+                "shared_buffers": {
+                  "type": "string",
+                  "title": "Shared Buffers",
+                  "description": "Amount of memory for shared buffer pool",
+                  "default": "256MB",
+                  "pattern": "^[0-9]+(MB|GB)$"
+                },
+                "effective_cache_size": {
+                  "type": "string",
+                  "title": "Effective Cache Size",
+                  "description": "Estimate of memory available for disk caching",
+                  "default": "1GB",
+                  "pattern": "^[0-9]+(MB|GB)$"
+                },
+                "work_mem": {
+                  "type": "string",
+                  "title": "Work Memory",
+                  "description": "Amount of memory for query operations",
+                  "default": "4MB",
+                  "pattern": "^[0-9]+(MB|GB)$"
+                },
+                "maintenance_work_mem": {
+                  "type": "string",
+                  "title": "Maintenance Work Memory",
+                  "description": "Memory for maintenance operations",
+                  "default": "64MB",
+                  "pattern": "^[0-9]+(MB|GB)$"
+                }
+              }
+            }
+          }
+        },
+        "resources": {
+          "type": "object",
+          "title": "Resource Configuration",
+          "description": "CPU and memory resource allocation",
+          "properties": {
+            "requests": {
+              "type": "object",
+              "title": "Resource Requests",
+              "description": "Minimum resource allocation",
+              "properties": {
+                "memory": {
+                  "type": "string",
+                  "title": "Memory Request",
+                  "description": "Minimum memory allocation",
+                  "default": "1Gi",
+                  "pattern": "^[0-9]+(Mi|Gi)$"
+                },
+                "cpu": {
+                  "type": "string",
+                  "title": "CPU Request",
+                  "description": "Minimum CPU allocation",
+                  "default": "500m",
+                  "pattern": "^[0-9]+m?$"
+                }
+              }
+            },
+            "limits": {
+              "type": "object",
+              "title": "Resource Limits",
+              "description": "Maximum resource allocation",
+              "properties": {
+                "memory": {
+                  "type": "string",
+                  "title": "Memory Limit",
+                  "description": "Maximum memory allocation",
+                  "default": "2Gi",
+                  "pattern": "^[0-9]+(Mi|Gi)$"
+                },
+                "cpu": {
+                  "type": "string",
+                  "title": "CPU Limit",
+                  "description": "Maximum CPU allocation",
+                  "default": "1",
+                  "pattern": "^[0-9]+m?$"
+                }
+              }
+            }
+          }
+        },
+        "storage": {
+          "type": "object",
+          "title": "Storage Configuration",
+          "description": "Storage settings for PostgreSQL data",
+          "properties": {
+            "size": {
+              "type": "string",
+              "title": "Storage Size",
+              "description": "Size of the main storage volume",
+              "default": "50Gi",
+              "pattern": "^[0-9]+(Mi|Gi)$"
+            },
+            "storageClass": {
+              "type": "string",
+              "title": "Storage Class",
+              "description": "Storage class for main storage (empty for default)",
+              "default": ""
+            }
+          }
+        },
+        "walStorage": {
+          "type": "object",
+          "title": "WAL Storage Configuration",
+          "description": "Write-Ahead Log storage settings",
+          "properties": {
+            "size": {
+              "type": "string",
+              "title": "WAL Storage Size",
+              "description": "Size of the WAL storage volume",
+              "default": "10Gi",
+              "pattern": "^[0-9]+(Mi|Gi)$"
+            },
+            "storageClass": {
+              "type": "string",
+              "title": "WAL Storage Class",
+              "description": "Storage class for WAL storage (empty for default)",
+              "default": ""
+            }
+          }
+        },
+        "bootstrap": {
+          "type": "object",
+          "title": "Bootstrap Configuration",
+          "description": "Database initialization settings",
+          "properties": {
+            "initdb": {
+              "type": "object",
+              "title": "Database Initialization",
+              "description": "Initial database setup",
+              "properties": {
+                "database": {
+                  "type": "string",
+                  "title": "Database Name",
+                  "description": "Initial database to create",
+                  "default": "app_db",
+                  "pattern": "^[a-zA-Z0-9_]+$",
+                  "minLength": 1,
+                  "maxLength": 63
+                },
+                "owner": {
+                  "type": "string",
+                  "title": "Database Owner",
+                  "description": "Owner of the initial database",
+                  "default": "app_owner",
+                  "pattern": "^[a-zA-Z0-9_]+$",
+                  "minLength": 1,
+                  "maxLength": 63
+                },
+                "secret": {
+                  "type": "object",
+                  "title": "Credentials Secret",
+                  "description": "Secret containing database credentials",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "title": "Secret Name",
+                      "description": "Name of the secret containing credentials",
+                      "default": "postgres-credentials"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "monitoring": {
+          "type": "object",
+          "title": "Monitoring Configuration",
+          "description": "Monitoring and metrics settings",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "title": "Enable Monitoring",
+              "description": "Enable PostgreSQL monitoring integration",
+              "default": true
+            }
+          }
+        },
+        "backup": {
+          "type": "object",
+          "title": "Backup Configuration",
+          "description": "Backup and recovery settings",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "title": "Enable Backup",
+              "description": "Enable automated backups (requires S3 configuration)",
+              "default": false
+            },
+            "retentionPolicy": {
+              "type": "string",
+              "title": "Backup Retention",
+              "description": "How long to keep backups",
+              "default": "30d",
+              "pattern": "^[0-9]+(d|w|m)$"
+            }
+          }
+        },
+        "pooler": {
+          "type": "object",
+          "title": "Connection Pooling",
+          "description": "PgBouncer connection pooling settings",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "title": "Enable Connection Pooling",
+              "description": "Enable PgBouncer connection pooler",
+              "default": true
+            },
+            "instances": {
+              "type": "integer",
+              "title": "Pooler Instances",
+              "description": "Number of connection pooler instances",
+              "default": 2,
+              "minimum": 1,
+              "maximum": 5
+            },
+            "type": {
+              "type": "string",
+              "title": "Pooler Type",
+              "description": "Type of connection pooler",
+              "default": "rw",
+              "enum": ["rw", "ro", "rw-split"]
+            },
+            "pgbouncer": {
+              "type": "object",
+              "title": "PgBouncer Settings",
+              "description": "PgBouncer configuration",
+              "properties": {
+                "poolMode": {
+                  "type": "string",
+                  "title": "Pool Mode",
+                  "description": "Connection pooling mode",
+                  "default": "transaction",
+                  "enum": ["session", "transaction", "statement"]
+                },
+                "parameters": {
+                  "type": "object",
+                  "title": "PgBouncer Parameters",
+                  "description": "PgBouncer configuration parameters",
+                  "properties": {
+                    "max_client_conn": {
+                      "type": "string",
+                      "title": "Max Client Connections",
+                      "description": "Maximum client connections per pooler",
+                      "default": "200",
+                      "pattern": "^[0-9]+$"
+                    },
+                    "default_pool_size": {
+                      "type": "string",
+                      "title": "Default Pool Size",
+                      "description": "Default connection pool size",
+                      "default": "25",
+                      "pattern": "^[0-9]+$"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "credentials": {
+      "type": "object",
+      "title": "Database Credentials",
+      "description": "Database authentication credentials",
+      "properties": {
+        "username": {
+          "type": "string",
+          "title": "Username",
+          "description": "Database username",
+          "default": "postgres"
+        },
+        "password": {
+          "type": "string",
+          "title": "Password",
+          "description": "Database password",
+          "format": "password"
+        }
+      },
+      "required": ["password"]
+    },
+    "security": {
+      "type": "object",
+      "title": "Security Configuration",
+      "description": "Pod security and scheduling settings",
+      "properties": {
+        "podSecurityContext": {
+          "type": "object",
+          "title": "Pod Security Context",
+          "description": "Security context for PostgreSQL pods",
+          "properties": {
+            "runAsNonRoot": {
+              "type": "boolean",
+              "title": "Run as Non-Root",
+              "description": "Run containers as non-root user",
+              "default": true
+            },
+            "runAsUser": {
+              "type": "integer",
+              "title": "Run as User ID",
+              "description": "User ID to run containers",
+              "default": 999,
+              "minimum": 1,
+              "maximum": 65535
+            },
+            "runAsGroup": {
+              "type": "integer",
+              "title": "Run as Group ID",
+              "description": "Group ID to run containers",
+              "default": 999,
+              "minimum": 1,
+              "maximum": 65535
+            },
+            "fsGroup": {
+              "type": "integer",
+              "title": "Filesystem Group ID",
+              "description": "Group ID for filesystem ownership",
+              "default": 999,
+              "minimum": 1,
+              "maximum": 65535
+            }
+          }
+        }
+      }
+    },
+    "affinity": {
+      "type": "object",
+      "title": "Scheduling Configuration",
+      "description": "Pod scheduling and affinity settings",
+      "properties": {
+        "enablePodAntiAffinity": {
+          "type": "boolean",
+          "title": "Enable Pod Anti-Affinity",
+          "description": "Spread pods across different nodes",
+          "default": true
+        },
+        "topologyKey": {
+          "type": "string",
+          "title": "Topology Key",
+          "description": "Kubernetes topology key for anti-affinity",
+          "default": "kubernetes.io/hostname"
+        }
+      }
+    },
+    "nodeSelector": {
+      "type": "object",
+      "title": "Node Selector",
+      "description": "Node selection constraints",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "tolerations": {
+      "type": "array",
+      "title": "Tolerations",
+      "description": "Pod tolerations for tainted nodes",
+      "items": {
+        "type": "object"
+      }
+    }
+  },
+  "required": ["cluster", "credentials"]
+}
