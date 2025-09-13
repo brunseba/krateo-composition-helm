@@ -1,0 +1,28 @@
+apiVersion: v1
+entries:
+  cnpg-postgres-cluster:
+  - annotations:
+      category: Database
+      licenses: Apache-2.0
+    apiVersion: v2
+    appVersion: "16.1"
+    created: "2025-09-13T12:18:57.203433+02:00"
+    description: A Helm chart for CloudNative-PG PostgreSQL clusters
+    digest: 8689ff3f9d31aff1c987f18115f0b4b681c14d70511b09f9f1252a2cc46c14b5
+    home: https://cloudnative-pg.io/
+    keywords:
+    - postgresql
+    - database
+    - cnpg
+    - cloudnative-pg
+    maintainers:
+    - email: platform@company.com
+      name: platform-team
+    name: cnpg-postgres-cluster
+    sources:
+    - https://github.com/cloudnative-pg/cloudnative-pg
+    type: application
+    urls:
+    - https://brunseba.github.io/krateo-composition-helm/cnpg-postgres-cluster-1.0.0.tgz
+    version: 1.0.0
+generated: "2025-09-13T12:18:57.202628+02:00"

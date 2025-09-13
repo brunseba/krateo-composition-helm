@@ -1,0 +1,32 @@
+# Helm
+*.tmp
+*.lock
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+*.swp
+*.swo
+
+# Build artifacts
+dist/
+build/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+temp/
+
+# Chart development
+charts/*.tgz.bak
+src/*/*.tgz
+
+# Backup files
+*.bak
+*~

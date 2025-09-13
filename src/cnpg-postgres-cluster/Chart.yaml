@@ -1,0 +1,20 @@
+annotations:
+  category: Database
+  licenses: Apache-2.0
+apiVersion: v2
+appVersion: "16.1"
+description: A Helm chart for CloudNative-PG PostgreSQL clusters
+home: https://cloudnative-pg.io/
+keywords:
+- postgresql
+- database
+- cnpg
+- cloudnative-pg
+maintainers:
+- email: platform@company.com
+  name: platform-team
+name: cnpg-postgres-cluster
+sources:
+- https://github.com/cloudnative-pg/cloudnative-pg
+type: application
+version: 1.0.0

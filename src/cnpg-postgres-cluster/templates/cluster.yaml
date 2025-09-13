@@ -1,0 +1,78 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: {{ .Values.cluster.name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cnpg-postgres-cluster.labels" . | nindent 4 }}
+    krateo.io/managed: "true"
+spec:
+  instances: {{ .Values.cluster.instances }}
+  primaryUpdateStrategy: {{ .Values.cluster.primaryUpdateStrategy }}
+  
+  postgresql:
+    parameters:
+      {{- toYaml .Values.cluster.postgresql.parameters | nindent 6 }}
+      
+  resources:
+    {{- toYaml .Values.cluster.resources | nindent 4 }}
+    
+  storage:
+    size: {{ .Values.cluster.storage.size }}
+    {{- if .Values.cluster.storage.storageClass }}
+    storageClass: {{ .Values.cluster.storage.storageClass }}
+    {{- end }}
+    
+  {{- if .Values.cluster.walStorage }}
+  walStorage:
+    size: {{ .Values.cluster.walStorage.size }}
+    {{- if .Values.cluster.walStorage.storageClass }}
+    storageClass: {{ .Values.cluster.walStorage.storageClass }}
+    {{- end }}
+  {{- end }}
+  
+  bootstrap:
+    initdb:
+      database: {{ .Values.cluster.bootstrap.initdb.database }}
+      owner: {{ .Values.cluster.bootstrap.initdb.owner }}
+      secret:
+        name: {{ .Values.cluster.bootstrap.initdb.secret.name }}
+        
+  {{- if .Values.cluster.monitoring.enabled }}
+  monitoring:
+    customQueriesConfigMap:
+      {{- toYaml .Values.cluster.monitoring.customQueriesConfigMap | nindent 6 }}
+  {{- end }}
+  
+  {{- if .Values.cluster.backup.enabled }}
+  backup:
+    target: {{ .Values.cluster.backup.target }}
+    retentionPolicy: {{ .Values.cluster.backup.retentionPolicy }}
+    barmanObjectStore:
+      destinationPath: {{ .Values.cluster.backup.barmanObjectStore.destinationPath }}
+      s3Credentials:
+        accessKeyId:
+          name: {{ .Values.cluster.backup.barmanObjectStore.s3Credentials.accessKeyId.name }}
+          key: {{ .Values.cluster.backup.barmanObjectStore.s3Credentials.accessKeyId.key }}
+        secretAccessKey:
+          name: {{ .Values.cluster.backup.barmanObjectStore.s3Credentials.secretAccessKey.name }}
+          key: {{ .Values.cluster.backup.barmanObjectStore.s3Credentials.secretAccessKey.key }}
+        region:
+          name: {{ .Values.cluster.backup.barmanObjectStore.s3Credentials.region.name }}
+          key: {{ .Values.cluster.backup.barmanObjectStore.s3Credentials.region.key }}
+  {{- end }}
+  
+  {{- if .Values.affinity.enablePodAntiAffinity }}
+  affinity:
+    topologyKey: {{ .Values.affinity.topologyKey }}
+  {{- end }}
+  
+  {{- if .Values.nodeSelector }}
+  nodeSelector:
+    {{- toYaml .Values.nodeSelector | nindent 4 }}
+  {{- end }}
+  
+  {{- if .Values.tolerations }}
+  tolerations:
+    {{- toYaml .Values.tolerations | nindent 4 }}
+  {{- end }}
